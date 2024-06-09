@@ -1,12 +1,33 @@
 -- Pull in the wezterm API
 local wezterm = require("wezterm")
+local act = wezterm.action
 
 -- This will hold the configuration.
 local config = wezterm.config_builder()
 
 -- FONT
--- config.font = wezterm.font("MesloLGS Nerd Font Mono")
 config.font_size = 15
+config.font = wezterm.font("JetBrains Mono")
+config.font_rules = {
+	-- For Bold-but-not-italic text, use this relatively bold font, and override
+	{
+		intensity = "Bold",
+		italic = false,
+		font = wezterm.font({
+			family = "JetBrains Mono",
+			weight = "Bold",
+		}),
+	},
+	{
+		intensity = "Bold",
+		italic = true,
+		font = wezterm.font({
+			family = "JetBrains Mono",
+			weight = "Bold",
+			italic = true,
+		}),
+	},
+}
 
 -- COLOR
 config.color_scheme = "Tokyo Night (Gogh)"
@@ -52,9 +73,55 @@ config.colors = {
 }
 
 -- WINDOW
-config.window_decorations = "RESIZE"
-config.window_close_confirmation = "AlwaysPrompt"
 -- config.window_background_opacity = 0.92
 -- config.macos_window_background_blur = 8
+config.window_decorations = "RESIZE"
+config.window_close_confirmation = "AlwaysPrompt"
+
+-- KEYS
+config.keys = {
+	{
+		key = "w",
+		mods = "CMD",
+		action = wezterm.action.CloseCurrentTab({ confirm = true }),
+	},
+}
+-- Keys
+config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
+config.keys = {
+	-- Send C-a when pressing C-a twice
+	{ key = "a", mods = "LEADER|CTRL", action = act.SendKey({ key = "a", mods = "CTRL" }) },
+	{ key = "c", mods = "LEADER", action = act.ActivateCopyMode },
+	{ key = "phys:Space", mods = "LEADER", action = act.ActivateCommandPalette },
+
+	-- Pane keybindings
+	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
+	{ key = "|", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	-- { key = "h", mods = "CTRL", action = act.ActivatePaneDirection("Left") },
+	-- { key = "j", mods = "CTRL", action = act.ActivatePaneDirection("Down") },
+	-- { key = "k", mods = "CTRL", action = act.ActivatePaneDirection("Up") },
+	-- { key = "l", mods = "CTRL", action = act.ActivatePaneDirection("Right") },
+	-- { key = "q", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
+	{ key = "m", mods = "LEADER", action = act.TogglePaneZoomState },
+	{
+		key = "r",
+		mods = "LEADER",
+		action = act.ActivateKeyTable({ name = "resize_pane", one_shot = false }),
+	},
+}
+
+config.key_tables = {
+	resize_pane = {
+		{ key = "h", action = act.AdjustPaneSize({ "Left", 1 }) },
+		{ key = "j", action = act.AdjustPaneSize({ "Down", 1 }) },
+		{ key = "k", action = act.AdjustPaneSize({ "Up", 1 }) },
+		{ key = "l", action = act.AdjustPaneSize({ "Right", 1 }) },
+		{ key = "Escape", action = "PopKeyTable" },
+		{ key = "Enter", action = "PopKeyTable" },
+	},
+}
+
+-- config to skip no process when confirm
+config.skip_close_confirmation_for_processes_named = {}
 
 return config
