@@ -6,7 +6,7 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 
 -- FONT
-config.font_size = 15
+config.font_size = 16
 config.font = wezterm.font("JetBrains Mono")
 config.font_rules = {
 	-- For Bold-but-not-italic text, use this relatively bold font, and override
@@ -70,6 +70,8 @@ config.colors = {
 			fg_color = "#ffffff",
 		},
 	},
+	-- recolor cursor when leader active
+	compose_cursor = "orange",
 }
 
 -- WINDOW
@@ -77,6 +79,7 @@ config.colors = {
 -- config.macos_window_background_blur = 8
 config.window_decorations = "RESIZE"
 config.window_close_confirmation = "AlwaysPrompt"
+config.initial_rows = 35
 
 -- KEYS
 config.keys = {
@@ -86,6 +89,7 @@ config.keys = {
 		action = wezterm.action.CloseCurrentTab({ confirm = true }),
 	},
 }
+
 -- Keys
 config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 1000 }
 config.keys = {
@@ -93,15 +97,14 @@ config.keys = {
 	{ key = "a", mods = "LEADER|CTRL", action = act.SendKey({ key = "a", mods = "CTRL" }) },
 	{ key = "c", mods = "LEADER", action = act.ActivateCopyMode },
 	{ key = "phys:Space", mods = "LEADER", action = act.ActivateCommandPalette },
-
 	-- Pane keybindings
 	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
 	{ key = "|", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
-	-- { key = "h", mods = "CTRL", action = act.ActivatePaneDirection("Left") },
-	-- { key = "j", mods = "CTRL", action = act.ActivatePaneDirection("Down") },
-	-- { key = "k", mods = "CTRL", action = act.ActivatePaneDirection("Up") },
-	-- { key = "l", mods = "CTRL", action = act.ActivatePaneDirection("Right") },
-	-- { key = "q", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
+	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
+	{ key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
+	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
+	{ key = "l", mods = "LEADER", action = act.ActivatePaneDirection("Right") },
+	{ key = "q", mods = "LEADER", action = act.CloseCurrentPane({ confirm = true }) },
 	{ key = "m", mods = "LEADER", action = act.TogglePaneZoomState },
 	{
 		key = "r",
@@ -120,6 +123,15 @@ config.key_tables = {
 		{ key = "Enter", action = "PopKeyTable" },
 	},
 }
+
+-- Update right status to indicate leader key activation
+wezterm.on("update-right-status", function(window, pane)
+	local leader = ""
+	if window:leader_is_active() then
+		leader = "LEADER"
+	end
+	window:set_right_status(leader)
+end)
 
 -- config to skip no process when confirm
 config.skip_close_confirmation_for_processes_named = {}
