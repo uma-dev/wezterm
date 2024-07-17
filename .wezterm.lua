@@ -77,6 +77,8 @@ config.colors = {
 -- WINDOW
 -- config.window_background_opacity = 0.92
 -- config.macos_window_background_blur = 8
+-- Avoid not closing widown in linux with
+-- config.window_decorations = "RESIZE | TITLE"
 config.window_decorations = "RESIZE"
 config.window_close_confirmation = "AlwaysPrompt"
 config.initial_rows = 35
@@ -99,7 +101,8 @@ config.keys = {
 	{ key = "phys:Space", mods = "LEADER", action = act.ActivateCommandPalette },
 	-- Pane keybindings
 	{ key = "-", mods = "LEADER", action = act.SplitVertical({ domain = "CurrentPaneDomain" }) },
-	{ key = "|", mods = "LEADER", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
+	-- Needs shift as mod in linux to avoid skipping | character (shift + \)
+	{ key = "|", mods = "LEADER|SHIFT", action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }) },
 	{ key = "h", mods = "LEADER", action = act.ActivatePaneDirection("Left") },
 	{ key = "j", mods = "LEADER", action = act.ActivatePaneDirection("Down") },
 	{ key = "k", mods = "LEADER", action = act.ActivatePaneDirection("Up") },
