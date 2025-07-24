@@ -59,7 +59,7 @@ return function(config, wezterm)
 					size = { Percent = 40 },
 				}),
 				act.SendString("nvim\n"),
-				act.SplitPane({ direction = "Down", size = { Percent = 50 } }),
+				act.SplitPane({ direction = "Down", size = { Percent = 25 } }),
 			}),
 		},
 	}
